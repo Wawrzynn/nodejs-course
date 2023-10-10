@@ -1,13 +1,14 @@
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
-const sendgridTransport = require("nodemailer-sendgrid-transport");
 const User = require("../models/user");
 
-const transporter = nodemailer.createTransport({
+const transport = nodemailer.createTransport({
+  host: "sandbox.smtp.mailtrap.io",
+  port: 2525,
   auth: {
-    api_key:
-      "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",
-  },
+    user: "5ef1168ab52d9d",
+    pass: "fe69e77457e119"
+  }
 });
 
 exports.getLogin = (req, res, next) => {
@@ -94,7 +95,7 @@ exports.postSignup = (req, res, next) => {
         })
         .then((result) => {
           res.redirect("/login");
-          return transporter.sendMail({
+          return transport.sendMail({
             to: email,
             from: "shop@node-complete.com",
             subject: "Signup succeeded!",
