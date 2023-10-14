@@ -44,7 +44,8 @@ exports.getProduct = (req, res, next) => {
 exports.getIndex = (req, res, next) => {
   const page = req.query.page;
   let totalItems;
-
+  
+  // Added pagination
   Product.find()
     .count()
     .then((numOfProducts) => {
