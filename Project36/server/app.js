@@ -7,6 +7,7 @@ const { graphqlHTTP } = require("express-graphql");
 const dotenv = require("dotenv");
 const fs = require("fs");
 
+const {clearImage} = require("./util/file");
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolver = require("./graphql/resolvers");
 const auth = require("./middleware/auth");
@@ -57,7 +58,7 @@ app.use((req, res, next) => {
 
 app.use(auth);
 
-app.use("/post-image", (req, res, next) => {
+app.put("/post-image", (req, res, next) => {
   if (!req.isAuth) {
     throw new Error("Not authenticated!");
   }
@@ -105,7 +106,3 @@ mongoose
   })
   .catch((err) => console.log(err));
 
-const clearImage = (filePath) => {
-  filePath = path.join(__dirname, "..", filePath);
-  fs.unlink(filePath, (err) => console.log(err));
-};
