@@ -1,7 +1,7 @@
 const expect = require("chai").expect;
 const sinon = require("sinon");
 const User = require("../models/user");
-const AuthController = require("../controllers/auth");
+const FeedController = require("../controllers/feed");
 const mongoose = require("mongoose");
 
 describe("Auth Controller - Login", function () {
@@ -25,42 +25,26 @@ describe("Auth Controller - Login", function () {
       });
   });
 
-  it("should throw an error with code 500 if accessing the database fails", function () {
-    sinon.stub(User, "findOne");
-    User.findOne.throws();
-
+  it("should add a created post to the posts of the creator", function () {
     const req = {
       body: {
-        email: "test@test.com",
-        password: "tester",
+        title: "Test Post",
+        content: "A Test Post",
       },
+      file: {
+        path: "abc",
+      },
+      userId: "5c0f66b979af55031b34728a",
     };
-
-    AuthController.login(req, {}, () => {}).then((result) => {
-      expect(result).to.be.an("error");
-      expect(result).to.have.property("statusCode", 500);
-      //   done();
-    });
-
-    User.findOne.restore();
-  });
-
-  it("should send a response with a valid user status for an existing user", function (done) {
-    const req = { userId: "5c0f66b979af55031b34728a" };
     const res = {
-      statusCode: 500,
-      userStatus: null,
-      status: function (code) {
-        this.statusCode = code;
+      status: function () {
         return this;
       },
-      json: function (data) {
-        this.userStatus = data.status;
-      },
+      json: function () {},
     };
-    AuthController.getUserStatus(req, res, () => {}).then(() => {
-      expect(res.statusCode).to.be.equal(200);
-      expect(res.userStatus).to.be.equal("I am new!");
+    FeedController.createPost(req, res, () => {}).then((savedUser) => {
+      expect(savedUser).to.have.property("posts");
+      expect(savedUser.posts).to.have.length(1);
       done();
     });
   });
